@@ -10,10 +10,14 @@ var summon = function (command) {
       return;
     }
   });
-  command.message.channel.sendMessage(command.user + ' summons ' + roleFound + ' to play ' + command.params[0]);
+  command.message.channel.sendMessage(command.user + ' summons' + roleFound + ' to play ' + command.params[0]);
 }
 
 exports.name = 'games';
-exports.commands = {
-  'summon': summon
-}
+exports.commands = [
+  {
+    cmd: 'summon',
+    func: summon,
+    desc: 'summon members of pizza gang to play the game `x`'
+  }
+]

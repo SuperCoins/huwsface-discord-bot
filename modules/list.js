@@ -47,9 +47,21 @@ var viewList = function (command) {
   }
 }
 
-exports.commands = {
-  "newlist": newList,
-  "addtoist": addToList,
-  "viewlist": viewList
-}
+exports.commands = [
+  {
+    cmd: 'newlist',
+    func: newList,
+    desc: 'create a new list with name `x`'
+  },
+  {
+    cmd: 'addtolist',
+    func: addToList,
+    desc: 'add value `y` to the list `x`'
+  },
+  {
+    cmd: 'viewlist',
+    func: viewList,
+    desc: 'view all entries in list `x`'
+  }
+]
 exports.name = "list";

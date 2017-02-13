@@ -4,16 +4,20 @@ const _ = require('lodash');
 const fs = require('fs');
 const bot = new Discord.Client();
 const token = require("./token.json").token;
+const padright = require('pad-right');
 
-var commands = [];
-fs.readdirSync('./modules').forEach(file => {
-    let mod = require('./modules/' + file);
-    let commandsObj = {
-        name: mod.name,
-        commands: mod.commands
-    };
-    commands.push(commandsObj);
-});
+var modules = [];
+function loadModules() {
+    modules = [];
+    fs.readdirSync('./modules').forEach(file => {
+        let mod = require('./modules/' + file);
+        let commandsObj = {
+            name: mod.name,
+            commands: mod.commands
+        };
+        modules.push(commandsObj);
+    });
+}
 
 bot.on('ready', () => {
     console.log('I am ready!');
@@ -24,6 +28,7 @@ bot.on('message', message => {
         processMessage(message);
 });
 
+loadModules();
 bot.login(token);
 
 function processMessage(message) {
@@ -46,9 +51,10 @@ function command(message) {
         help(com);
         return;
     }
-    for (let mod of commands) {
-        if (mod.commands.hasOwnProperty(com.command)) {
-            mod.commands[com.command](com);
+    for (let mod of modules) {
+        let found = mod.commands.find(x => x.cmd == com.command)
+        if (found != undefined) {
+            found.func(com);
             commandExists = true;
             break;
         }
@@ -63,6 +69,7 @@ function splitter(message) {
     let contents = _.split(message.content, ' ');
     return {
         command: contents[0].substring(1),
+        rest: message.content.slice(contents[0].length + 1),
         params: contents.slice(1, contents.length),
         user: message.author.username,
         message: message
@@ -72,10 +79,10 @@ function splitter(message) {
 function help(command) {
     let msg = '```diff\n';
     msg += 'available commands:\n'
-    for (let mod of commands) {
+    for (let mod of modules) {
         msg += '- ' + mod.name + '\n';
-        for (let cmdName of Object.keys(mod.commands)) {
-            msg += '+  ' + cmdName + '\n';
+        for (let cmd of mod.commands) {
+            msg += '+  ' + padright(cmd.cmd, 20, ' ') + ' 🡒 ' + cmd.desc + '\n';
         }
     }
     msg += '```';
