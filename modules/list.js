@@ -4,46 +4,55 @@ const fs = require('fs');
 const _ = require('lodash');
 
 var newList = function (command) {
-  let listName = command.params[0];
+  let listName = command.rest.trim();
   let author = command.user;
-  let pathToFile = LIST_DIR + listName + '.json';
-  if (fs.existsSync(pathToFile)) {
-    command.message.channel.sendMessage('List already exists');
+  let pathToFile = LIST_DIR + 'lists.json';
+  var json = jsonfile.readFileSync(pathToFile);
+  if (json[listName]) {
+    command.message.channel.sendMessage('list already exists!');
   } else {
-    let file = {
-      contents: [],
-      author: author
+    json[listName] = {
+      author: author,
+      entries: []
     }
-    jsonfile.writeFileSync(pathToFile, file);
-    command.message.channel.sendMessage('List created');
+    json.writeFileSync(pathToFile, json);
   }
 }
 
 var addToList = function (command) {
-  let listName = command.params[0];
-  let value = command.params[1];
-  let pathToFile = LIST_DIR + listName + '.json';
-  if (fs.existsSync(pathToFile)) {
-    let list = jsonfile.readFileSync(pathToFile);
-    list.contents.push(value);
-    jsonfile.writeFileSync(pathToFile, list);
-    command.message.channel.sendMessage("Added '" + value + "' to list");
+  let rest = command.rest;
+  let author = command.user;
+  let pathToFile = LIST_DIR + 'lists.json';
+  var regex = /^'(.*?)' (.*)/;
+  var json = jsonfile.readFileSync(pathToFile);
+  if (rest.test(regex)) {
+    var parts = rest.match(regex);
+    var listName = parts[1];
+    var value = parts[2];
+    if (json[listName]) {
+      json[listName].entries.push(value);
+      json.writeFileSync(pathToFile, json);
+    } else {
+      command.message.channel.sendMessage('couldn\'t find list :(')
+    }
+  } else {
+    command.message.channel.sendMessage('oops! maybe your syntax was wrong or you had a typo?');
   }
 }
 
 var viewList = function (command) {
-  let listName = command.params[0];
-  let pathToFile = LIST_DIR + listName + '.json';
-  if (fs.existsSync(pathToFile)) {
-    let list = jsonfile.readFileSync(pathToFile).contents;
-    let output = "```diff" + "\n" + "- " + listName + '\n';
-    _.forEach(list, function (item) {
-      output += '+ ' + item + '\n';
+  let listName = command.rest.trim();
+  let author = command.user;
+  let pathToFile = LIST_DIR + 'lists.json';
+  var json = jsonfile.readFileSync(pathToFile);
+  if (json[listName]) {
+    var msg = '```diff\n- ' + listName + ' (by ' + author + ')';
+    json[listName].entries.forEach(x => {
+      msg += '+ ' + x + '\n';
     });
-    output += "```"
-    command.message.channel.sendMessage(output);
+    command.message.channel.sendMessage(msg);
   } else {
-    command.message.channel.sendMessage('List does not exist');
+    command.message.channel.sendMessage('couldn\'t find list :(')
   }
 }
 
