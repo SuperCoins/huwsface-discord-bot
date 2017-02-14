@@ -10,7 +10,7 @@ var summon = function (command) {
       return;
     }
   });
-  command.message.channel.sendMessage(command.user + ' summons' + roleFound + ' to play ' + command.params[0]);
+  command.message.channel.sendMessage(command.user + ' summons ' + roleFound + ' to play ' + command.params[0]);
 }
 
 exports.name = 'games';
