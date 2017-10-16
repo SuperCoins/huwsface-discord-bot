@@ -4,7 +4,6 @@ const _ = require('lodash');
 const fs = require('fs');
 const bot = new Discord.Client();
 const token = require("./token.json").token;
-const padright = require('pad-right');
 
 var modules = [];
 function loadModules() {
@@ -82,7 +81,7 @@ function help(command) {
     for (let mod of modules) {
         msg += '- ' + mod.name + '\n';
         for (let cmd of mod.commands) {
-            msg += '+  ' + padright(cmd.cmd, 20, ' ') + ' 🡒 ' + cmd.desc + '\n';
+            msg += '+  ' + cmd.cmd.padEnd(' ', 20) + ' 🡒 ' + cmd.desc + '\n';
         }
     }
     msg += '```';

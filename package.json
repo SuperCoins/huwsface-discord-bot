@@ -14,7 +14,6 @@
     "discord.js-commando": "^0.9.0",
     "jsonfile": "^2.4.0",
     "lodash": "^4.17.4",
-    "pad-right": "^0.2.2",
     "sqlite": "^2.3.0"
   }
 }
